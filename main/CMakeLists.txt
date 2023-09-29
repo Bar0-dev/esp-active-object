@@ -1,2 +1,2 @@
-idf_component_register(SRCS "esp-ao.c"
+idf_component_register(SRCS "main-esp-ao.c"
                     INCLUDE_DIRS ".")
