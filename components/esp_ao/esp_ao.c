@@ -80,10 +80,8 @@ void TimeEvent_ctor(TimeEvent * const me, char * const timerName, TickType_t per
     xTimer = xTimerCreate(timerName, period, autoReload, (void *)0, xTimerCallback);
     assert(xTimer);
     me->handle = xTimer;
-    //portENTER_CRITICAL();
     l_timeEvents[l_activeTimeEvents] = me;
     l_activeTimeEvents++;
-    //portEXIT_CRITICAL();
 }
 
 void TimeEvent_arm(TimeEvent * const me)
@@ -96,10 +94,6 @@ void TimeEvent_arm(TimeEvent * const me)
 void TimeEvent_disarm(TimeEvent * const me)
 {
     BaseType_t xReturned;
-    //portENTER_CRITICAL();
     xReturned = xTimerStop(me->handle, (TickType_t)0);
     assert(xReturned);
-    l_timeEvents[l_activeTimeEvents] = NULL;
-    l_activeTimeEvents--;
-    //portEXIT_CRITICAL();
 }

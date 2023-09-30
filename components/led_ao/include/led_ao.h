@@ -4,6 +4,7 @@
 #include "esp_ao.h"
 
 #define LED_PIN 27
+#define BLINK_PERIOD_DEFAULT 1000
 
 typedef struct
 {

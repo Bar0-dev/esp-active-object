@@ -4,7 +4,8 @@
 #include "esp_ao.h"
 
 #define BUTTON_PIN 25
-#define DEBOUNCE_TIME 1000
+#define DEBOUNCE_TIME 15
+#define POLL_TIME 50
 
 typedef struct
 {
@@ -12,6 +13,7 @@ typedef struct
     bool state;
 
     TimeEvent debounceTimer;
+    TimeEvent pollTimer;
 } Button;
 
 enum ButtonEventSignals
@@ -23,5 +25,10 @@ enum ButtonEventSignals
 };
 
 void Button_ctor(Button * const me);
+
+/**
+ * Active objects
+*/
+extern Active *AO_Led;
 
 #endif

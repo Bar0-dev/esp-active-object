@@ -16,21 +16,24 @@ static const gpio_config_t gpioConfig =
 static void Button_pressed_handler(void)
 {
     ESP_LOGI("Button", "Pressed");
+    Active_post(AO_Led, &(Event){ 3 });
 }
 
 static void Button_released_handler(void)
 {
     ESP_LOGI("Button", "Released");
+    Active_post(AO_Led, &(Event){ 4 });
 }
 static void Button_dispatch(Button * const me, Event const * const e)
 {
-    static volatile bool currState;
+    static bool currState = true;
 
     switch (e->sig)
     {
     case INIT_SIG:
-        me->state = true;
+        me->state = (bool)gpio_get_level(BUTTON_PIN);;
         Active_post(&me->super, &(Event){ BUTTON_POLL_SIG });
+        TimeEvent_arm(&me->pollTimer);
         break;
 
     case BUTTON_POLL_SIG:
@@ -52,19 +55,15 @@ static void Button_dispatch(Button * const me, Event const * const e)
                 Active_post(&me->super, &(Event){ BUTTON_PRESSED_SIG });
             }
             me->state = currState;
-        } else {
-            Active_post(&me->super, &(Event){ BUTTON_POLL_SIG });
         }
         break;
     
     case BUTTON_PRESSED_SIG:
         Button_pressed_handler();
-        Active_post(&me->super, &(Event){ BUTTON_POLL_SIG });
         break;
     
     case BUTTON_RELEASED_SIG:
         Button_released_handler();
-        Active_post(&me->super, &(Event){ BUTTON_POLL_SIG });
         break;
 
     default:
@@ -77,4 +76,5 @@ void Button_ctor(Button * const me)
     ESP_ERROR_CHECK(gpio_config(&gpioConfig));
     Active_ctor(&me->super, (DispatchHandler)&Button_dispatch);
     TimeEvent_ctor(&me->debounceTimer, "Debouce timer", (TickType_t)(DEBOUNCE_TIME/portTICK_PERIOD_MS), pdFALSE, BUTTON_DEBOUNCED_SIG, &me->super);
+    TimeEvent_ctor(&me->pollTimer, "Poll timer", (TickType_t)(POLL_TIME/portTICK_PERIOD_MS), pdTRUE, BUTTON_POLL_SIG, &me->super);
 }
