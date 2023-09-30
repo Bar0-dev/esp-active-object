@@ -53,7 +53,6 @@ struct Active
 
 void Active_ctor(Active * const me, DispatchHandler dispatch);
 void Active_start(Active * const me,
-                Event e,
                 const char *const taskNamePtr,
                 const uint32_t stackSize, /*stack size in number of bytes*/
                 UBaseType_t taskPriority,
@@ -69,15 +68,14 @@ void Active_post(Active * const me, Event const * const e);
 typedef struct
 {
     Event super;
-    char * timerName;
     Active *act;
     TickType_t period;
     UBaseType_t autoReload;
     TimerHandle_t handle;
 } TimeEvent;
 
-void TimeEvent_ctor(TimeEvent * const me, char * const timerName, Signal sig, Active *act); /*associate actor to the timer*/
-void TimeEvent_arm(TimeEvent * const me, TickType_t period, UBaseType_t autoReload); /*create xTimer*/
+void TimeEvent_ctor(TimeEvent * const me, char * const timerName, TickType_t period, UBaseType_t autoReload, Signal sig, Active *act); /*associate actor to the timer*/
+void TimeEvent_arm(TimeEvent * const me); /*create xTimer*/
 void TimeEvent_disarm(TimeEvent * const me); /*delete xTimer*/
 
 #endif

@@ -2,6 +2,9 @@
 #include "esp_ao.h"
 #include "freertos/timers.h"
 
+#include "esp_log.h"
+
+
 void Active_ctor(Active * const me, DispatchHandler dispatch)
 {
     me->dispatch = dispatch;
@@ -20,14 +23,15 @@ static void Active_eventLoop(void *pvParameters)
         Event e;
 
         xReturned = xQueueReceive(me->queue, (void *)&e, (TickType_t)10);
-        assert(xReturned == pdPASS);
-
-        (*me->dispatch)(me, &e);
+        // assert(xReturned == pdPASS || xReturned == pdFAIL);
+        if(xReturned == pdPASS)
+        {
+            (*me->dispatch)(me, &e);
+        }
     }   
 }
 
 void Active_start(Active * const me,
-                Event e,
                 const char *const taskNamePtr,
                 const uint32_t stackSize, /*stack size in bytes*/
                 UBaseType_t taskPriority,
@@ -37,7 +41,7 @@ void Active_start(Active * const me,
     BaseType_t xReturned;
     assert(me && (taskPriority > 0));
 
-    me->queue = xQueueCreate(queueLength, sizeof(e));
+    me->queue = xQueueCreate(queueLength, sizeof(Event));
     assert(me->queue);
 
     xReturned = xTaskCreatePinnedToCore(&Active_eventLoop, taskNamePtr, stackSize, me, taskPriority, me->task, core);
@@ -51,36 +55,31 @@ void Active_post(Active * const me, Event const * const e)
     assert(xReturned == pdPASS);
 }
 
-void TimeEvent_ctor(TimeEvent * const me, char * const timerName, Signal sig, Active *act)
-{
-    me->act = act;
-    assert(me->act);
-    me->timerName = timerName;
-    me->super.sig = sig;
-}
-
 static TimeEvent *l_timeEvents[MAX_TIMERS];
 static uint32_t l_activeTimeEvents = 0;
 
 static void xTimerCallback(TimerHandle_t xTimer)
 {
-    TimeEvent timeEvent;
+    TimeEvent *timeEvent;
     //portENTER_CRITICAL();
     for (int timeEventNum = 0; timeEventNum<l_activeTimeEvents; timeEventNum++)
     {
-        timeEvent = *l_timeEvents[timeEventNum];
-        if(xTimer == timeEvent.handle)
+        timeEvent = l_timeEvents[timeEventNum];
+        if(xTimer == timeEvent->handle)
         {
-            Active_post(timeEvent.act, &timeEvent.super);
+            Active_post(timeEvent->act, &timeEvent->super);
         }
     }
     //portEXIT_CRITICAL();
 }
 
-void TimeEvent_arm(TimeEvent * const me, TickType_t period, UBaseType_t autoReload)
+void TimeEvent_ctor(TimeEvent * const me, char * const timerName, TickType_t period, UBaseType_t autoReload, Signal sig, Active *act)
 {
     TimerHandle_t xTimer;
-    xTimer = xTimerCreate(me->timerName, period, autoReload, NULL, &xTimerCallback);
+    
+    me->super.sig = sig;
+    me->act = act;
+    xTimer = xTimerCreate(timerName, period, autoReload, (void *)0, xTimerCallback);
     assert(xTimer);
     me->handle = xTimer;
     //portENTER_CRITICAL();
@@ -89,11 +88,18 @@ void TimeEvent_arm(TimeEvent * const me, TickType_t period, UBaseType_t autoRelo
     //portEXIT_CRITICAL();
 }
 
+void TimeEvent_arm(TimeEvent * const me)
+{
+    BaseType_t xReturned;
+    xReturned = xTimerStart(me->handle, (TickType_t)0);
+    assert(xReturned);
+}
+
 void TimeEvent_disarm(TimeEvent * const me)
 {
     BaseType_t xReturned;
     //portENTER_CRITICAL();
-    xReturned = xTimerDelete(me->handle, 0);
+    xReturned = xTimerStop(me->handle, (TickType_t)0);
     assert(xReturned);
     l_timeEvents[l_activeTimeEvents] = NULL;
     l_activeTimeEvents--;

@@ -3,14 +3,14 @@
 #include "esp_ao.h"
 
 #define LED_PIN 27
-#define BLINK_PERIOD 200
+#define BLINK_PERIOD 1000
 
 typedef struct
 {
     Active super;
 
     bool state;
-    TimeEvent *ledTimer;
+    TimeEvent ledTimer;
 } Led;
 
 enum EventSignals
