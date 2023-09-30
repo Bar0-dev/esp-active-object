@@ -38,6 +38,7 @@ static void Led_dispatch(Led * const me, Event const * const e)
     
     case DISARM_BLINK_SIG:
         TimeEvent_disarm(&me->ledTimer);
+        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
         break;
 
     case BLINK_TIMER_EXPIRED_SIG:

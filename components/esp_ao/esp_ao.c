@@ -54,21 +54,13 @@ void Active_post(Active * const me, Event const * const e)
 }
 
 static TimeEvent *l_timeEvents[MAX_TIMERS];
-static uint32_t l_activeTimeEvents = 0;
+static uint16_t l_activeTimers = 0;
 
 static void xTimerCallback(TimerHandle_t xTimer)
 {
-    TimeEvent *timeEvent;
-    //portENTER_CRITICAL();
-    for (int timeEventNum = 0; timeEventNum<l_activeTimeEvents; timeEventNum++)
-    {
-        timeEvent = l_timeEvents[timeEventNum];
-        if(xTimer == timeEvent->handle)
-        {
-            Active_post(timeEvent->act, &timeEvent->super);
-        }
-    }
-    //portEXIT_CRITICAL();
+    TimeEvent *timeEvent = (TimeEvent *)pvTimerGetTimerID(xTimer);
+    assert(xTimer == timeEvent->handle);
+    Active_post(timeEvent->act, &timeEvent->super);
 }
 
 void TimeEvent_ctor(TimeEvent * const me, char * const timerName, TickType_t period, UBaseType_t autoReload, Signal sig, Active *act)
@@ -79,9 +71,10 @@ void TimeEvent_ctor(TimeEvent * const me, char * const timerName, TickType_t per
     me->act = act;
     xTimer = xTimerCreate(timerName, period, autoReload, (void *)0, xTimerCallback);
     assert(xTimer);
+    l_timeEvents[l_activeTimers] = me;
+    vTimerSetTimerID(xTimer, l_timeEvents[l_activeTimers]);
+    l_activeTimers++;
     me->handle = xTimer;
-    l_timeEvents[l_activeTimeEvents] = me;
-    l_activeTimeEvents++;
 }
 
 void TimeEvent_arm(TimeEvent * const me)

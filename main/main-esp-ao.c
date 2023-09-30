@@ -12,8 +12,8 @@ Active *AO_Button = &button.super;
 void app_main(void)
 {
     Led_ctor(&led);
-    Active_start(AO_Led, "LED thread", 2048, 10, 1, 10);
+    Active_start(AO_Led, "LED thread", 2048, 10, tskNO_AFFINITY, 10);
 
     Button_ctor(&button);
-    Active_start(AO_Button, "Button thread", 2048, 1, 1, 10);
+    Active_start(AO_Button, "Button thread", 2048, 1, tskNO_AFFINITY, 10);
 }
