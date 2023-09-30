@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "led_ao.h"
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
@@ -67,5 +66,5 @@ void Led_ctor(Led * const me)
 {
     ESP_ERROR_CHECK(gpio_config(&gpioConfig));
     Active_ctor(&me->super, (DispatchHandler)&Led_dispatch);
-    TimeEvent_ctor(&me->ledTimer, "LED timer", (TickType_t)(BLINK_PERIOD/portTICK_PERIOD_MS), pdTRUE, BLINK_TIMER_EXPIRED_SIG, &me->super);
+    TimeEvent_ctor(&me->ledTimer, "LED timer", (TickType_t)(me->blinkPeriod/portTICK_PERIOD_MS), pdTRUE, BLINK_TIMER_EXPIRED_SIG, &me->super);
 }

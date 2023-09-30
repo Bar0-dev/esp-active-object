@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "esp_ao.h"
 #include "freertos/timers.h"
 
@@ -23,7 +22,6 @@ static void Active_eventLoop(void *pvParameters)
         Event e;
 
         xReturned = xQueueReceive(me->queue, (void *)&e, (TickType_t)10);
-        // assert(xReturned == pdPASS || xReturned == pdFAIL);
         if(xReturned == pdPASS)
         {
             (*me->dispatch)(me, &e);
