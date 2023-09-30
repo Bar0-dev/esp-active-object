@@ -4,7 +4,7 @@
 #include "esp_ao.h"
 
 #define BUTTON_PIN 25
-#define DEBOUNCE_TIME 10
+#define DEBOUNCE_TIME 1000
 
 typedef struct
 {

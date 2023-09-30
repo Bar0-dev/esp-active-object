@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ESP_AO_H
 #define ESO_AO_H
 
@@ -5,6 +6,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/timers.h"
 
 /**
  * Signal definition and reserved signals, USER_SIG is a first signal available for the user
