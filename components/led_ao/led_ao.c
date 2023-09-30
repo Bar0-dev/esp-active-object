@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "led_ao.h"
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
@@ -19,33 +18,21 @@ static void Led_dispatch(Led * const me, Event const * const e)
     switch (e->sig)
     {
     case INIT_SIG:
-        //DEBUG
-        ESP_LOGI("led ao", "INIT_SIG");
-        //DEBUG
         ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
         me->state = false;
         break;
 
     case LED_ON_SIG:
-        //DEBUG
-        ESP_LOGI("led ao", "LED_ON_SIG");
-        //DEBUG
         ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 1));
         me->state = true;
         break;
 
     case LED_OFF_SIG:
-        //DEBUG
-        ESP_LOGI("led ao", "LED_OFF_SIG");
-        //DEBUG
         ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
         me->state = false;
         break;
 
     case ARM_BLINK_SIG:
-        //DEBUG
-        ESP_LOGI("led ao", "ARM_BLINK_SIG");
-        //DEBUG
         TimeEvent_arm(&me->ledTimer);
         break;
     
@@ -66,6 +53,7 @@ static void Led_dispatch(Led * const me, Event const * const e)
 void Led_ctor(Led * const me)
 {
     ESP_ERROR_CHECK(gpio_config(&gpioConfig));
+    me->blinkPeriod = BLINK_PERIOD_DEFAULT;
     Active_ctor(&me->super, (DispatchHandler)&Led_dispatch);
-    TimeEvent_ctor(&me->ledTimer, "LED timer", (TickType_t)(BLINK_PERIOD/portTICK_PERIOD_MS), pdTRUE, BLINK_TIMER_EXPIRED_SIG, &me->super);
+    TimeEvent_ctor(&me->ledTimer, "LED timer", (TickType_t)(me->blinkPeriod/portTICK_PERIOD_MS), pdTRUE, BLINK_TIMER_EXPIRED_SIG, &me->super);
 }

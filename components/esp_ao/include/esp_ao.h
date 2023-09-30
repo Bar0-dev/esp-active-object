@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ESP_AO_H
 #define ESO_AO_H
 
