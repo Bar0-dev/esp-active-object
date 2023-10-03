@@ -33,6 +33,8 @@ static void Led_dispatch(Led * const me, Event const * const e)
         break;
 
     case ARM_BLINK_SIG:
+        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 1));
+        me->state = true;
         TimeEvent_arm(&me->ledTimer);
         break;
     

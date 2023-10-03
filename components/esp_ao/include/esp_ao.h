@@ -77,7 +77,7 @@ typedef struct
 } TimeEvent;
 
 void TimeEvent_ctor(TimeEvent * const me, char * const timerName, TickType_t period, UBaseType_t autoReload, Signal sig, Active *act); /*associate actor to the timer*/
-void TimeEvent_arm(TimeEvent * const me); /*create xTimer*/
-void TimeEvent_disarm(TimeEvent * const me); /*delete xTimer*/
+void TimeEvent_arm(TimeEvent * const me); /*start xTimer*/
+void TimeEvent_disarm(TimeEvent * const me); /*stop xTimer*/
 
 #endif

@@ -1,6 +1,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 
+#include "led_ao.h"
 #include "button_ao.h"
 
 
@@ -16,13 +17,13 @@ static const gpio_config_t gpioConfig =
 static void Button_pressed_handler(void)
 {
     ESP_LOGI("Button", "Pressed");
-    Active_post(AO_Led, &(Event){ 3 });
+    Active_post(AO_Led, &(Event){ ARM_BLINK_SIG });
 }
 
 static void Button_released_handler(void)
 {
     ESP_LOGI("Button", "Released");
-    Active_post(AO_Led, &(Event){ 4 });
+    Active_post(AO_Led, &(Event){ DISARM_BLINK_SIG });
 }
 static void Button_dispatch(Button * const me, Event const * const e)
 {
