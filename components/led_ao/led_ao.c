@@ -22,23 +22,13 @@ static void Led_dispatch(Led * const me, Event const * const e)
         me->state = false;
         break;
 
-    case LED_ON_SIG:
-        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 1));
-        me->state = true;
-        break;
-
-    case LED_OFF_SIG:
-        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
-        me->state = false;
-        break;
-
-    case ARM_BLINK_SIG:
+    case EV_BUTTON_PRESSED:
         ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 1));
         me->state = true;
         TimeEvent_arm(&me->ledTimer);
         break;
     
-    case DISARM_BLINK_SIG:
+    case EV_BUTTON_RELEASED:
         TimeEvent_disarm(&me->ledTimer);
         ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
         break;

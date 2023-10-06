@@ -3,6 +3,10 @@
 
 #include "led_ao.h"
 #include "button_ao.h"
+#include "events_broker.h"
+
+static Broker broker;
+Active *AO_Broker = &broker.super;
 
 static Led led;
 Active *AO_Led = &led.super;
@@ -11,9 +15,18 @@ Active *AO_Button = &button.super;
 
 void app_main(void)
 {
+    Broker_ctor(&broker);
+    Active_start(AO_Broker, "Broker thread", 4096, 20, tskNO_AFFINITY, 20);
+
     Led_ctor(&led);
     Active_start(AO_Led, "LED thread", 2048, 10, tskNO_AFFINITY, 10);
 
     Button_ctor(&button);
     Active_start(AO_Button, "Button thread", 2048, 1, tskNO_AFFINITY, 10);
+
+    /**
+     * Subscriptions
+    */
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_PRESSED }, AO_Led->queue);
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_RELEASED }, AO_Led->queue);
 }

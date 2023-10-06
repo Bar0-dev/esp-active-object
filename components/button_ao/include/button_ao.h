@@ -29,6 +29,6 @@ void Button_ctor(Button * const me);
 /**
  * Active objects
 */
-extern Active *AO_Led;
+extern Active *AO_Broker;
 
 #endif

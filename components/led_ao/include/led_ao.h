@@ -2,6 +2,7 @@
 #define LED_AO_H
 
 #include "esp_ao.h"
+#include "events_broker.h"
 
 #define LED_PIN 27
 #define BLINK_PERIOD_DEFAULT 200
