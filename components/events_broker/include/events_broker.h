@@ -23,6 +23,7 @@ typedef struct
 typedef struct
 {
     Active super;
+    GlobalEvent globalEvents[LAST_EVENT_FLAG];
 } Broker;
 
 void Broker_ctor(Broker * const me);
