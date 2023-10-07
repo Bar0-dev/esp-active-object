@@ -42,7 +42,7 @@ static void Led_dispatch(Led * const me, Event const * const e)
             break;
 
         case EV_BUTTON_PRESSED:
-            if (me->blinkPeriod <= 500)
+            if (me->blinkPeriod <= 300)
             {
                 me->blinkPeriod +=100;
             } else {
@@ -75,9 +75,9 @@ static void Led_dispatch(Led * const me, Event const * const e)
             break;
         
         case EV_BUTTON_PRESSED:
-            if (me->blinkPeriod <= 500)
+            if (me->blinkPeriod <= 300)
             {
-                me->blinkPeriod +=100;
+                me->blinkPeriod += 100;
             } else {
                 me->blinkPeriod = 100;
             }
@@ -88,11 +88,10 @@ static void Led_dispatch(Led * const me, Event const * const e)
             break;
         
         case EV_BUTTON_HOLD:
-            TimeEvent_arm(&me->ledTimer);
+            TimeEvent_disarm(&me->ledTimer);
             break;
         
         case EV_BUTTON_DOUBLE_PRESS:
-            TimeEvent_disarm(&me->ledTimer);
             break;
 
         default:

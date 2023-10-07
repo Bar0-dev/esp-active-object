@@ -38,14 +38,13 @@ static void Button_dispatch(Button * const me, Event const * const e)
             if (currState)
             {
                 Active_post(AO_Broker, &(Event){ EV_BUTTON_RELEASED });
-                TimeEvent_disarm(&me->holdTimer);
                 TimeEvent_arm(&me->doublePressTimer);
             } else {
                 Active_post(AO_Broker, &(Event){ EV_BUTTON_PRESSED });
                 TimeEvent_arm(&me->holdTimer);
+                me->pressCount++;
             }
             me->state = currState;
-            TimeEvent_reset(&me->pollTimer);
         }
         break;
     
@@ -54,15 +53,15 @@ static void Button_dispatch(Button * const me, Event const * const e)
         {
             Active_post(AO_Broker, &(Event){ EV_BUTTON_HOLD });
         }
-        TimeEvent_reset(&me->pollTimer);
+        me->state = currState;
         break;
 
     case BUTTON_DOUBLE_PRESS_SIG:
-        if (currState == false)
+        if (me->pressCount >= 2)
         {
             Active_post(AO_Broker, &(Event){ EV_BUTTON_DOUBLE_PRESS });
         }
-        TimeEvent_reset(&me->pollTimer);
+        me->pressCount = 0;
         break;
 
     default:

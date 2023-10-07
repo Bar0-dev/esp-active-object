@@ -6,13 +6,14 @@
 #define BUTTON_PIN 25
 #define DEBOUNCE_TIME 15
 #define POLL_TIME 50
-#define HOLD_TIME 1000
-#define DOUBLE_PRESS_TIME 300
+#define HOLD_TIME 700
+#define DOUBLE_PRESS_TIME 200
 
 typedef struct
 {
     Active super;
     bool state;
+    uint8_t pressCount;
 
     TimeEvent debounceTimer;
     TimeEvent pollTimer;
