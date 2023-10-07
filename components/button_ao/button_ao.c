@@ -39,6 +39,7 @@ static void Button_dispatch(Button * const me, Event const * const e)
             {
                 Active_post(AO_Broker, &(Event){ EV_BUTTON_RELEASED });
                 TimeEvent_arm(&me->doublePressTimer);
+                TimeEvent_disarm(&me->holdTimer);
             } else {
                 Active_post(AO_Broker, &(Event){ EV_BUTTON_PRESSED });
                 TimeEvent_arm(&me->holdTimer);
