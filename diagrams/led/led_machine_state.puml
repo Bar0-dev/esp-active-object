@@ -1,0 +1,40 @@
+' @startuml
+' overlap = false; 
+' splines = true;
+
+' [*] --> LED_OFF : Led_off()
+
+' LED_OFF --> LED_ON : BLINK_TIMER_EXPIRED_SIG \n Led_on()
+' LED_ON --> LED_OFF : BLINK_TIMER_EXPIRED_SIG \n Led_off()
+
+' LED_OFF -left-> LED_OFF : EV_BUTTON_HOLD \n arm blink timer
+' LED_OFF -down-> LED_OFF : EV_BUTTON_PRESS \n change blink timeout
+' LED_OFF -right-> LED_OFF : EV_BUTTON_DOUBLE_PRESS \n disarm blink timer
+
+
+' LED_ON --> LED_ON : EV_BUTTON_HOLD \n arm blink timer
+' LED_ON --> LED_ON : EV_BUTTON_PRESS \n change blink timeout
+' LED_ON --> LED_ON : EV_BUTTON_DOUBLE_PRESS \n disarm blink timer
+
+
+' @endum
+
+@startuml
+[*] --> IDLE : Led_off()
+
+state IDLE {
+  LED_ON --> LED_OFF : EV_BUTTON_RELEASED \n Led_off()
+  LED_OFF --> LED_ON : EV_BUTTON_PRESSED \n Led_on()
+}
+
+state BLINK {
+  LED_OFF_ --> LED_ON_ : BLINK_TIMER_EXPIRED_SIG \n Led_on()
+  LED_ON_  --> LED_OFF_ : BLINK_TIMER_EXPIRED_SIG \n Led_off()
+}
+
+BLINK --> BLINK : EV_BUTTON_PRESS \n change blink timeout
+
+BLINK --> IDLE : EV_BUTTON_DOUBLE_PRESS \n disarm blink timer
+IDLE --> BLINK : EV_BUTTON_HOLD \n arm blink timer
+
+@enduml

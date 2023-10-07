@@ -14,55 +14,55 @@ static const gpio_config_t gpioConfig =
     .intr_type = GPIO_INTR_DISABLE,
 };
 
-static void Button_pressed_handler(void)
-{
-    Active_post(AO_Broker, &(Event){ EV_BUTTON_PRESSED });
-}
-
-static void Button_released_handler(void)
-{
-    Active_post(AO_Broker, &(Event){ EV_BUTTON_RELEASED });
-}
 static void Button_dispatch(Button * const me, Event const * const e)
 {
-    static bool currState = true;
+    bool currState = (bool)gpio_get_level(BUTTON_PIN);
 
     switch (e->sig)
     {
     case INIT_SIG:
-        me->state = (bool)gpio_get_level(BUTTON_PIN);;
-        Active_post(&me->super, &(Event){ BUTTON_POLL_SIG });
+        me->state = currState;
         TimeEvent_arm(&me->pollTimer);
         break;
 
     case BUTTON_POLL_SIG:
-        currState = (bool)gpio_get_level(BUTTON_PIN);
-        if(me->state != currState)
+        if (me->state != currState)
         {
             TimeEvent_arm(&me->debounceTimer);
         }
         break;
 
     case BUTTON_DEBOUNCED_SIG:
-        currState = (bool)gpio_get_level(BUTTON_PIN);
-        if(me->state != currState)
+        if (me->state != currState)
         {
             if (currState)
             {
-                Active_post(&me->super, &(Event){ BUTTON_RELEASED_SIG });
+                Active_post(AO_Broker, &(Event){ EV_BUTTON_RELEASED });
+                TimeEvent_disarm(&me->holdTimer);
+                TimeEvent_arm(&me->doublePressTimer);
             } else {
-                Active_post(&me->super, &(Event){ BUTTON_PRESSED_SIG });
+                Active_post(AO_Broker, &(Event){ EV_BUTTON_PRESSED });
+                TimeEvent_arm(&me->holdTimer);
             }
             me->state = currState;
+            TimeEvent_reset(&me->pollTimer);
         }
         break;
     
-    case BUTTON_PRESSED_SIG:
-        Button_pressed_handler();
+    case BUTTON_HOLD_SIG:
+        if (currState == false)
+        {
+            Active_post(AO_Broker, &(Event){ EV_BUTTON_HOLD });
+        }
+        TimeEvent_reset(&me->pollTimer);
         break;
-    
-    case BUTTON_RELEASED_SIG:
-        Button_released_handler();
+
+    case BUTTON_DOUBLE_PRESS_SIG:
+        if (currState == false)
+        {
+            Active_post(AO_Broker, &(Event){ EV_BUTTON_DOUBLE_PRESS });
+        }
+        TimeEvent_reset(&me->pollTimer);
         break;
 
     default:
@@ -76,4 +76,6 @@ void Button_ctor(Button * const me)
     Active_ctor(&me->super, (DispatchHandler)&Button_dispatch);
     TimeEvent_ctor(&me->debounceTimer, "Debouce timer", (TickType_t)(DEBOUNCE_TIME/portTICK_PERIOD_MS), pdFALSE, BUTTON_DEBOUNCED_SIG, &me->super);
     TimeEvent_ctor(&me->pollTimer, "Poll timer", (TickType_t)(POLL_TIME/portTICK_PERIOD_MS), pdTRUE, BUTTON_POLL_SIG, &me->super);
+    TimeEvent_ctor(&me->holdTimer, "Hold timer", (TickType_t)(HOLD_TIME/portTICK_PERIOD_MS), pdFALSE, BUTTON_HOLD_SIG, &me->super);
+    TimeEvent_ctor(&me->doublePressTimer, "Double press timer", (TickType_t)(DOUBLE_PRESS_TIME/portTICK_PERIOD_MS), pdFALSE, BUTTON_DOUBLE_PRESS_SIG, &me->super);
 }

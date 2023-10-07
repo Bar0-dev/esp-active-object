@@ -1,34 +1,7 @@
 @startuml
 
-[*] --> Released
+[*] --> POLLING
 
-Released --> Debouncing : button pin is low
-Released -> Released : polling timer expired
-Released : entry / arm polling timer
-Released : do / check button pin state
 
-Debouncing : entry / arm debouce timer
-Debouncing : do / disarm polling timer
-
-Debouncing -> Debounced : debounce timer expired
-Debounced : do / check button pin state
-
-Debounced --> Released : button pin is high
-Debounced -> Pressed : button pin is low
-
-Pressed --> Released : button pin is high
-Pressed : entry / arm hold timer
-Pressed : do / chcek button pin state
-Pressed -> Hold : button pin is low;\n hold timer expired
-Pressed : publish / EV_LED_change_blink_period
-
-Hold -> Released : button pin is high
-Hold : do / chcek button pin state
-Hold : publish / EV_LED_turn_on_blink
-
-Debounced --> Double_Pressed : button pin is low;\n hold timer not expired yet
-Double_Pressed: do / chcek button pin state
-
-Double_Pressed -> Released : button pin is high
 
 @endum

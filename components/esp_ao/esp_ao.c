@@ -90,3 +90,17 @@ void TimeEvent_disarm(TimeEvent * const me)
     xReturned = xTimerStop(me->handle, (TickType_t)0);
     assert(xReturned);
 }
+
+void TimeEvent_change_period(TimeEvent * const me, TickType_t period)
+{
+    BaseType_t xReturned;
+    xReturned = xTimerChangePeriod(me->handle, period, (TickType_t)0);
+    assert(xReturned);
+}
+
+void TimeEvent_reset(TimeEvent * const me)
+{
+    BaseType_t xReturned;
+    xReturned = xTimerReset(me->handle, (TickType_t)0);
+    assert(xReturned);
+}

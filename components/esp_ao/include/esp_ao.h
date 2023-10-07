@@ -79,5 +79,7 @@ typedef struct
 void TimeEvent_ctor(TimeEvent * const me, char * const timerName, TickType_t period, UBaseType_t autoReload, Signal sig, Active *act); /*associate actor to the timer*/
 void TimeEvent_arm(TimeEvent * const me); /*start xTimer*/
 void TimeEvent_disarm(TimeEvent * const me); /*stop xTimer*/
+void TimeEvent_change_period(TimeEvent * const me, TickType_t period);
+void TimeEvent_reset(TimeEvent * const me);
 
 #endif

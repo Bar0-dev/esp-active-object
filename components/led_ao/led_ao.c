@@ -13,32 +13,95 @@ static const gpio_config_t gpioConfig =
     .intr_type = GPIO_INTR_DISABLE,
 };
 
+static void Led_off(void)
+{
+    ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
+}
+
+static void Led_on(void)
+{
+    ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 1));
+}
+
 static void Led_dispatch(Led * const me, Event const * const e)
 {
-    switch (e->sig)
+    if (e->sig == INIT_SIG)
     {
-    case INIT_SIG:
-        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
-        me->state = false;
+        Led_off();
+        me->state = OFF_STATE;
+    }
+
+    switch (me->state)
+    {
+    case OFF_STATE:
+        switch (e->sig)
+        {
+        case BLINK_TIMER_EXPIRED_SIG:
+            Led_on();
+            me->state = ON_STATE;
+            break;
+
+        case EV_BUTTON_PRESSED:
+            if (me->blinkPeriod <= 500)
+            {
+                me->blinkPeriod +=100;
+            } else {
+                me->blinkPeriod = 100;
+            }
+            //DEBUG
+            ESP_LOGI("LED", "period: %d", me->blinkPeriod);
+            //DEBUG
+            TimeEvent_change_period(&me->ledTimer, (TickType_t)(me->blinkPeriod/portTICK_PERIOD_MS));
+            break;
+        
+        case EV_BUTTON_HOLD:
+            TimeEvent_disarm(&me->ledTimer);
+            break;
+        
+        case EV_BUTTON_DOUBLE_PRESS:
+            break;
+
+        default:
+            break;
+        }
         break;
 
-    case EV_BUTTON_PRESSED:
-        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 1));
-        me->state = true;
-        TimeEvent_arm(&me->ledTimer);
-        break;
-    
-    case EV_BUTTON_RELEASED:
-        TimeEvent_disarm(&me->ledTimer);
-        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 0));
-        break;
+    case ON_STATE:
+        switch (e->sig)
+        {
+        case BLINK_TIMER_EXPIRED_SIG:
+            Led_off();
+            me->state = OFF_STATE;
+            break;
+        
+        case EV_BUTTON_PRESSED:
+            if (me->blinkPeriod <= 500)
+            {
+                me->blinkPeriod +=100;
+            } else {
+                me->blinkPeriod = 100;
+            }
+            //DEBUG
+            ESP_LOGI("LED", "period: %d", me->blinkPeriod);
+            //DEBUG
+            TimeEvent_change_period(&me->ledTimer, (TickType_t)(me->blinkPeriod/portTICK_PERIOD_MS));
+            break;
+        
+        case EV_BUTTON_HOLD:
+            TimeEvent_arm(&me->ledTimer);
+            break;
+        
+        case EV_BUTTON_DOUBLE_PRESS:
+            TimeEvent_disarm(&me->ledTimer);
+            break;
 
-    case BLINK_TIMER_EXPIRED_SIG:
-        me->state = !me->state;
-        ESP_ERROR_CHECK(gpio_set_level(LED_PIN, me->state));
+        default:
+            break;
+        }
         break;
 
     default:
+        assert(0);
         break;
     }
 }
@@ -46,7 +109,7 @@ static void Led_dispatch(Led * const me, Event const * const e)
 void Led_ctor(Led * const me)
 {
     ESP_ERROR_CHECK(gpio_config(&gpioConfig));
-    me->blinkPeriod = BLINK_PERIOD_DEFAULT;
+    me->blinkPeriod = 100;
     Active_ctor(&me->super, (DispatchHandler)&Led_dispatch);
     TimeEvent_ctor(&me->ledTimer, "LED timer", (TickType_t)(me->blinkPeriod/portTICK_PERIOD_MS), pdTRUE, BLINK_TIMER_EXPIRED_SIG, &me->super);
 }

@@ -29,4 +29,6 @@ void app_main(void)
     */
     Broker_subscribe(&broker, &(Event){ EV_BUTTON_PRESSED }, AO_Led->queue);
     Broker_subscribe(&broker, &(Event){ EV_BUTTON_RELEASED }, AO_Led->queue);
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_HOLD }, AO_Led->queue);
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_DOUBLE_PRESS }, AO_Led->queue);
 }

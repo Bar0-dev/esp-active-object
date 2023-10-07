@@ -3,6 +3,9 @@
 
 static void Broker_publish(Broker * const me, Event const * const e)
 {
+    //DEBUG
+    ESP_LOGI("BROKER", "SIG: %d", e->sig);
+    //DEBUG
     if (e->sig != INIT_SIG)
     {
         uint8_t eventId = e->sig-1;
