@@ -19,6 +19,8 @@ typedef uint16_t Signal;
 enum ReservedSignals
 {
     INIT_SIG,
+    ENTRY_SIG,
+    EXIT_SIG,
     USER_SIG,
 };
 
