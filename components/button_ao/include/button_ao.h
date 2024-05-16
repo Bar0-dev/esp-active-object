@@ -13,15 +13,6 @@ typedef struct
 {
     Active super;
 
-    enum
-    {
-        RELEASED,
-        PRESSED,
-        HOLD,
-        PRE_DOUBLE_PRESSED,
-        DOUBLE_PRESSED,
-    } state;
-
     TimeEvent debounceTimer;
     TimeEvent pollTimer;
     TimeEvent holdTimer;

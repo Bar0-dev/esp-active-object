@@ -9,6 +9,27 @@
 #include "freertos/timers.h"
 
 /**
+ * Finite State Machine implementation
+*/
+
+typedef struct Fsm Fsm; // Finite state machine struct forward declaration
+
+typedef enum { TRAN_STATUS, HANDLED_STATUS, IGNORED_STATUS, INIT_STATUS } State;
+
+typedef State (*StateHandler)(Fsm * const me, Event const * const e);
+
+#define TRAN(target_) (((Fsm *)me)->state = (StateHandler)(target_), TRAN_STATUS)
+
+struct Fsm
+{
+    StateHandler state;
+};
+
+void Fsm_ctor(Fsm * const me, StateHandler initial);
+void Fsm_init(Fsm * const me, Event const * const e);
+void Fsm_dispatch(Fsm * const me, Event const * const e);
+
+/**
  * Signal definition and reserved signals, USER_SIG is a first signal available for the user
 */
 
@@ -48,14 +69,13 @@ typedef void (*DispatchHandler)(Active * const me, Event const * const e);
 
 struct Active
 {
+    Fsm super;
     TaskHandle_t *task;
     QueueHandle_t queue;
-
-    DispatchHandler dispatch;
     /*additional subclass data*/
 };
 
-void Active_ctor(Active * const me, DispatchHandler dispatch);
+void Active_ctor(Active * const me, StateHandler initial);
 void Active_start(Active * const me,
                 const char *const taskNamePtr,
                 const uint32_t stackSize, /*stack size in number of bytes*/

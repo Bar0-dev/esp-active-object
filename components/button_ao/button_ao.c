@@ -175,7 +175,7 @@ static void Button_dispatch(Button *const me, Event const *const e)
 void Button_ctor(Button *const me)
 {
     ESP_ERROR_CHECK(gpio_config(&gpioConfig));
-    Active_ctor(&me->super, (DispatchHandler)&Button_dispatch);
+    Active_ctor(&me->super, (StateHandler)&Button_initial);
     TimeEvent_ctor(&me->debounceTimer, "Debouce timer", (TickType_t)(DEBOUNCE_TIME / portTICK_PERIOD_MS), pdFALSE, BUTTON_DEBOUNCED_SIG, &me->super);
     TimeEvent_ctor(&me->pollTimer, "Poll timer", (TickType_t)(POLL_TIME / portTICK_PERIOD_MS), pdTRUE, BUTTON_POLL_SIG, &me->super);
     TimeEvent_ctor(&me->holdTimer, "Hold timer", (TickType_t)(HOLD_TIME / portTICK_PERIOD_MS), pdFALSE, BUTTON_HOLD_SIG, &me->super);

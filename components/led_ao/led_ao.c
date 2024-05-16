@@ -23,6 +23,41 @@ static void Led_on(void)
     ESP_ERROR_CHECK(gpio_set_level(LED_PIN, 1));
 }
 
+static State Led_initial(Led * const me, Event const * const e)
+{
+    return TRAN(Led_idle);
+}
+
+static State Led_idle(Led * const me, Event const * const e)
+{
+    State status;
+    switch (e->sig)
+    {
+    case ENTRY_SIG:
+        Led_off();
+        status = HANDLED_STATUS;
+        break;
+    
+    case EXIT_SIG:
+        break;
+    
+    case EV_BUTTON_PRESSED:
+        TRAN(Led_blink);
+        break;
+    
+    default:
+        status = IGNORED_STATUS;
+        break;
+    }
+}
+
+static State Led_blink(Led * const me, Event const * const e)
+{
+
+}
+
+
+
 static void Led_dispatch(Led * const me, Event const * const e)
 {
     if (e->sig == INIT_SIG)

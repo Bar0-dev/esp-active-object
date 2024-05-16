@@ -3,18 +3,45 @@
 
 #include "esp_log.h"
 
+static Event const entryEvt = { ENTRY_SIG };
+static Event const exitEvt = { EXIT_SIG };
 
-void Active_ctor(Active * const me, DispatchHandler dispatch)
+void Fsm_ctor(Fsm * const me, StateHandler initial)
 {
-    me->dispatch = dispatch;
+    me->state = initial;
+}
+
+void Fsm_init(Fsm * const me, Event const * const e)
+{
+    assert(me->state != (StateHandler)0);
+    (*me->state)(me, e);
+    (*me->state)(me, &entryEvt);
+}
+
+void Fsm_dispatch(Fsm * const me, Event const * const e)
+{
+    State status;
+    StateHandler prevState = me->state;
+    assert(me->state != (StateHandler)0);
+    status = (*me->state)(me ,e);
+
+    if (status == TRAN_STATUS)
+    {
+        (*prevState)(me, &exitEvt);
+        (*me->state)(me, &entryEvt);
+    }
+}
+
+void Active_ctor(Active * const me, StateHandler initial)
+{   
+    Fsm_ctor(&me->super, initial);
 }
 
 static void Active_eventLoop(void *pvParameters)
 {
     Active *me = (Active *)pvParameters;
 
-    static Event const initEvent = { INIT_SIG };
-    (*me->dispatch)(me, &initEvent);
+    Fsm_init(&me->super, (Event *)0);
 
     while (1)
     {
@@ -24,7 +51,7 @@ static void Active_eventLoop(void *pvParameters)
         xReturned = xQueueReceive(me->queue, (void *)&e, (TickType_t)10);
         if(xReturned == pdPASS)
         {
-            (*me->dispatch)(me, &e);
+            Fsm_dispatch(&me->super, &e);
         }
     }   
 }

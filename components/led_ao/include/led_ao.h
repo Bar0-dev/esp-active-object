@@ -9,14 +9,7 @@
 typedef struct
 {
     Active super;
-
-    enum
-    {
-        OFF_STATE,
-        ON_STATE,
-    } state;
     uint16_t blinkPeriod;
-
     TimeEvent ledTimer;
 } Led;
 
