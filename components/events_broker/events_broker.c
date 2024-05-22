@@ -1,7 +1,7 @@
 #include "events_broker.h"
 #include "esp_log.h"
 
-static void Broker_publish(Broker * const me, Event const * const e)
+State Broker_publish(Broker * const me, Event const * const e)
 {
     //DEBUG
     ESP_LOGI("BROKER", "SIG: %d", e->sig);
@@ -19,13 +19,14 @@ static void Broker_publish(Broker * const me, Event const * const e)
 
 void Broker_ctor(Broker * const me)
 {
-    Active_ctor(&me->super, (DispatchHandler)&Broker_publish);
+    Active_ctor(&me->super, (StateHandler)&Broker_publish);
 }
 
 void Broker_subscribe(Broker * const me, Event const * const e, QueueHandle_t queueHandle)
 {
     uint8_t eventId = e->sig-1;
     GlobalEvent *globalEvent = &me->globalEvents[eventId];
+    assert(globalEvent->queuesSubscribed+1<MAX_QUEUES_PER_EVENT);
     globalEvent->queues[globalEvent->queuesSubscribed] = queueHandle;
     globalEvent->queuesSubscribed++;
 }

@@ -61,8 +61,6 @@ typedef struct
 
 typedef struct Active Active;
 
-typedef void (*DispatchHandler)(Active * const me, Event const * const e);
-
 /**
  * Active object base class
 */
