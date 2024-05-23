@@ -1,7 +1,14 @@
 #include "button_ao.h"
 
+State Button_init(Button *const me, Event const *const e);
+State Button_released(Button *const me, Event const *const e);
+State Button_pressed(Button *const me, Event const *const e);
+State Button_pre_doublepressed(Button *const me, Event const *const e);
+State Button_doublepressed(Button *const me, Event const *const e);
+State Button_hold(Button *const me, Event const *const e);
+
 State Button_init(Button *const me, Event const *const e){
-    return TRAN(Button_released);
+    return transition(&me->super.super, (StateHandler)&Button_released);
 }
 
 State Button_released(Button *const me, Event const *const e){
@@ -14,7 +21,7 @@ State Button_released(Button *const me, Event const *const e){
             break;
 
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            TRAN(Button_pressed);
+            transition(&me->super.super, (StateHandler)&Button_pressed);
             status = HANDLED_STATUS;
             break;
         
@@ -40,12 +47,12 @@ State Button_pressed(Button *const me, Event const *const e){
             break;
 
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            TRAN(Button_doublepressed);
+            transition(&me->super.super, (StateHandler)&Button_pre_doublepressed);
             status = HANDLED_STATUS;
             break;
         
         case BUTTON_HOLD_TIMEOUT_SIG:
-            TRAN(Button_hold);
+            transition(&me->super.super, (StateHandler)&Button_hold);
             status = HANDLED_STATUS;
             break;
         
@@ -70,12 +77,12 @@ State Button_pre_doublepressed(Button *const me, Event const *const e){
             break;
         
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            TRAN(Button_doublepressed);
+            transition(&me->super.super, (StateHandler)&Button_doublepressed);
             status = HANDLED_STATUS;
             break;
         
         case BUTTON_DOUBLE_PRESS_TIMEOUT_SIG:
-            TRAN(Button_released);
+            transition(&me->super.super, (StateHandler)&Button_released);
             status = HANDLED_STATUS;
             break;
 
@@ -100,7 +107,7 @@ State Button_hold(Button *const me, Event const *const e){
             break;
         
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            TRAN(Button_released);
+            transition(&me->super.super, (StateHandler)&Button_released);
             status = HANDLED_STATUS;
             break;
 
@@ -125,7 +132,7 @@ State Button_doublepressed(Button *const me, Event const *const e){
             status = HANDLED_STATUS;
             break;
         
-        case BUTTON_STATE_CHANGED_SIG:
+        case EV_POLLING_BUTTON_STATE_CHANGED:
             status = HANDLED_STATUS;
             break;
 

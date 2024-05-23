@@ -33,9 +33,9 @@ void app_main(void)
     /**
      * Subscriptions
     */
-    Broker_subscribe(&broker, &(Event){ EV_POLLING_BUTTON_STATE_CHANGED }, AO_Button->queue);
-    Broker_subscribe(&broker, &(Event){ EV_BUTTON_PRESSED }, AO_Led->queue);
-    Broker_subscribe(&broker, &(Event){ EV_BUTTON_RELEASED }, AO_Led->queue);
-    Broker_subscribe(&broker, &(Event){ EV_BUTTON_HOLD }, AO_Led->queue);
-    Broker_subscribe(&broker, &(Event){ EV_BUTTON_DOUBLE_PRESS }, AO_Led->queue);
+    Broker_subscribe(&broker, &(Event){ EV_POLLING_BUTTON_STATE_CHANGED }, AO_Button);
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_PRESSED }, AO_Led);
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_RELEASED }, AO_Led);
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_HOLD }, AO_Led);
+    Broker_subscribe(&broker, &(Event){ EV_BUTTON_DOUBLE_PRESS }, AO_Led);
 }

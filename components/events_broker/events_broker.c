@@ -6,27 +6,36 @@ State Broker_publish(Broker * const me, Event const * const e)
     //DEBUG
     ESP_LOGI("BROKER", "SIG: %d", e->sig);
     //DEBUG
-    if (e->sig != INIT_SIG)
-    {
-        uint8_t eventId = e->sig-1;
-        GlobalEvent *globalEvent = &me->globalEvents[eventId];
-        for (int q = 0; q<globalEvent->queuesSubscribed; q++)
+    uint8_t aoId = e->sig-USER_SIG;
+    GlobalEvent_t *globalEvent = &me->globalEvents[aoId];
+    BaseType_t ret = pdFAIL;
+    if(globalEvent->subscribers > 0){
+        for (int q = 0; q<globalEvent->subscribers; q++)
         {
-            assert(xQueueSend(globalEvent->queues[q], &(Event){ e->sig }, (TickType_t)10));
+            Active_post(globalEvent->aos[q], e);
         }
     }
+    ESP_LOGI("BROKER", "ret: %d", ret);
+    return HANDLED_STATUS;
+}
+
+State Broker_init(Broker * const me, Event const * const e)
+{
+    return transition(&me->super.super, (StateHandler)&Broker_publish);
 }
 
 void Broker_ctor(Broker * const me)
 {
-    Active_ctor(&me->super, (StateHandler)&Broker_publish);
+    Active_ctor(&me->super, (StateHandler)&Broker_init);
 }
 
-void Broker_subscribe(Broker * const me, Event const * const e, QueueHandle_t queueHandle)
+void Broker_subscribe(Broker * const me, Event const * const e, Active const * const ao)
 {
-    uint8_t eventId = e->sig-1;
-    GlobalEvent *globalEvent = &me->globalEvents[eventId];
-    assert(globalEvent->queuesSubscribed+1<MAX_QUEUES_PER_EVENT);
-    globalEvent->queues[globalEvent->queuesSubscribed] = queueHandle;
-    globalEvent->queuesSubscribed++;
+    GlobalSignal_t gsig = e->sig;
+    uint8_t aoId = gsig - USER_SIG;
+    GlobalEvent_t *globalEvent = &me->globalEvents[aoId];
+    assert(globalEvent->subscribers+1<MAX_AOS_PER_EVENT);
+    globalEvent->aos[globalEvent->subscribers] = ao;
+    ESP_LOGI("BROKER", "SIG: %d SUBBED: %d", e->sig, globalEvent->subscribers);
+    globalEvent->subscribers++;
 }

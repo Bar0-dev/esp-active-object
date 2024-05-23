@@ -51,7 +51,7 @@ static void Active_eventLoop(void *pvParameters)
         xReturned = xQueueReceive(me->queue, (void *)&e, (TickType_t)10);
         if(xReturned == pdPASS)
         {
-            Fsm_dispatch(&me->super, e);
+            Fsm_dispatch(&me->super, &e);
         }
     }   
 }

@@ -4,12 +4,26 @@
 #include "esp_ao.h"
 #include "events_broker.h"
 
-#define LED_PIN 27
+#define LED_PIN 33
+
+typedef enum
+{
+    LED_OFF,
+    LED_ON,
+} LedState_t;
+
+typedef enum
+{
+    BLINK_FAST = 100,
+    BLINK_MEDIUM = 500,
+    BLINK_SLOW = 1000,
+} BlinkPeriod_t;
 
 typedef struct
 {
     Active super;
-    uint16_t blinkPeriod;
+    bool ledState;
+    BlinkPeriod_t blinkPeriod;
     TimeEvent ledTimer;
 } Led;
 

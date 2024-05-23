@@ -5,7 +5,7 @@
 #include "esp_ao.h"
 #include "events_broker.h"
 
-#define BUTTON_PIN 25
+#define BUTTON_PIN 17
 #define POLL_TIME 50
 #define DEBOUNCE_TIME 15
 

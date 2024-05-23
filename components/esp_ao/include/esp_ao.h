@@ -9,27 +9,6 @@
 #include "freertos/timers.h"
 
 /**
- * Finite State Machine implementation
-*/
-
-typedef struct Fsm Fsm; // Finite state machine struct forward declaration
-
-typedef enum { TRAN_STATUS, HANDLED_STATUS, IGNORED_STATUS, INIT_STATUS } State;
-
-typedef State (*StateHandler)(Fsm * const me, Event const * const e);
-
-#define TRAN(target_) (((Fsm *)me)->state = (StateHandler)(target_), TRAN_STATUS)
-
-struct Fsm
-{
-    StateHandler state;
-};
-
-void Fsm_ctor(Fsm * const me, StateHandler initial);
-void Fsm_init(Fsm * const me, Event const * const e);
-void Fsm_dispatch(Fsm * const me, Event const * const e);
-
-/**
  * Signal definition and reserved signals, USER_SIG is a first signal available for the user
 */
 
@@ -54,6 +33,31 @@ typedef struct
     Signal sig;
     /*additional subclass data*/
 } Event;
+
+/**
+ * Finite State Machine implementation
+*/
+
+typedef struct Fsm Fsm; // Finite state machine struct forward declaration
+
+typedef enum { TRAN_STATUS, HANDLED_STATUS, IGNORED_STATUS, INIT_STATUS } State;
+
+typedef State (*StateHandler)(Fsm * const me, Event const * const e);
+
+struct Fsm
+{
+    StateHandler state;
+};
+
+static inline State transition(Fsm * const me, StateHandler const target){
+    me->state = target;
+    return TRAN_STATUS;
+}
+
+void Fsm_ctor(Fsm * const me, StateHandler initial);
+void Fsm_init(Fsm * const me, Event const * const e);
+void Fsm_dispatch(Fsm * const me, Event const * const e);
+
 
 /**
  * Active object utils

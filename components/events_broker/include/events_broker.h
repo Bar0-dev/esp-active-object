@@ -3,9 +3,9 @@
 
 #include "esp_ao.h"
 
-#define MAX_QUEUES_PER_EVENT 10
+#define MAX_AOS_PER_EVENT 10
 
-enum eventIds
+typedef enum 
 {
     EV_BUTTON_PRESSED = USER_SIG,
     EV_BUTTON_RELEASED,
@@ -13,22 +13,23 @@ enum eventIds
     EV_BUTTON_HOLD,
     EV_POLLING_BUTTON_STATE_CHANGED,
     LAST_EVENT_FLAG,
-};
+} GlobalSignal_t;
 
 typedef struct 
 {
-    QueueHandle_t queues[MAX_QUEUES_PER_EVENT];
-    uint8_t queuesSubscribed;
-} GlobalEvent;
+    Event super;
+    Active *aos[MAX_AOS_PER_EVENT];
+    uint8_t subscribers;
+} GlobalEvent_t;
 
 typedef struct
 {
     Active super;
-    GlobalEvent globalEvents[LAST_EVENT_FLAG];
+    GlobalEvent_t globalEvents[LAST_EVENT_FLAG-USER_SIG];
 } Broker;
 
 void Broker_ctor(Broker * const me);
 
-void Broker_subscribe(Broker * const me, Event const * const e, QueueHandle_t queueHandle);
+void Broker_subscribe(Broker * const me, Event const * const e, Active const * const ao);
 
 #endif
