@@ -48,6 +48,7 @@ State Polling_polling(Polling * const me, Event const * const e)
 }
 
 State Polling_init(Polling * const me, Event const * const e){
+    me->buttonPrevState = 1;
     return transition(&me->super.super, (StateHandler)&Polling_polling);
 }
 

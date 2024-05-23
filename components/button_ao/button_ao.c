@@ -17,7 +17,6 @@ State Button_released(Button *const me, Event const *const e){
     switch (e->sig)
     {
         case ENTRY_SIG:
-            Active_post(AO_Broker, &(Event){ EV_BUTTON_RELEASED });
             status = HANDLED_STATUS;
             break;
 
@@ -124,13 +123,9 @@ State Button_doublepressed(Button *const me, Event const *const e){
         case ENTRY_SIG:
             TimeEvent_disarm(&me->doublePressTimer);
             Active_post(AO_Broker, &(Event){ EV_BUTTON_DOUBLE_PRESS });
-            status = HANDLED_STATUS;
+            status = transition(&me->super.super, (StateHandler)&Button_released);
             break;
         
-        case EV_POLLING_BUTTON_STATE_CHANGED:
-            status = HANDLED_STATUS;
-            break;
-
         case EXIT_SIG:
             status = HANDLED_STATUS;
             break;
