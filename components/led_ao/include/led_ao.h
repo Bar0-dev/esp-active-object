@@ -4,7 +4,7 @@
 #include "esp_ao.h"
 #include "events_broker.h"
 
-#define LED_PIN 33
+#define LED_PIN 2
 
 typedef enum
 {

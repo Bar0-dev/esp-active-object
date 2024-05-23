@@ -30,6 +30,6 @@ typedef struct
 
 void Broker_ctor(Broker * const me);
 
-void Broker_subscribe(Broker * const me, Event const * const e, Active const * const ao);
+void Broker_subscribe(Broker * const me, Event const * const e, Active * const ao);
 
 #endif

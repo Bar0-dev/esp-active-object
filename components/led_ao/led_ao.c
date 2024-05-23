@@ -62,13 +62,11 @@ State Led_blink(Led * const me, Event const * const e)
         break;
     
     case EV_BUTTON_HOLD:
-        transition(&me->super.super, (StateHandler)&Led_solid);
-        status = HANDLED_STATUS;
+        status = transition(&me->super.super, (StateHandler)&Led_solid);
         break;
         
     case EV_BUTTON_DOUBLE_PRESS:   
-        transition(&me->super.super, (StateHandler)&Led_idle);
-        status = HANDLED_STATUS;
+        status = transition(&me->super.super, (StateHandler)&Led_idle);
         break;
 
     case EXIT_SIG:
@@ -99,8 +97,7 @@ State Led_idle(Led * const me, Event const * const e)
         break;
     
     case EV_BUTTON_PRESSED:
-        transition(&me->super.super, (StateHandler)&Led_blink);
-        status = HANDLED_STATUS;
+        status = transition(&me->super.super, (StateHandler)&Led_blink);
         break;
     
     default:
@@ -126,13 +123,11 @@ State Led_solid(Led * const me, Event const * const e){
         break;
     
     case EV_BUTTON_PRESSED:   
-        transition(&me->super.super, (StateHandler)&Led_blink);
-        status = HANDLED_STATUS;
+        status = transition(&me->super.super, (StateHandler)&Led_blink);
         break;
         
     case EV_BUTTON_DOUBLE_PRESS:   
-        transition(&me->super.super, (StateHandler)&Led_idle);
-        status = HANDLED_STATUS;
+        status = transition(&me->super.super, (StateHandler)&Led_idle);
         break;
 
     case EXIT_SIG:

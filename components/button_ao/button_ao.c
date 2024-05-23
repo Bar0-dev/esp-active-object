@@ -1,4 +1,5 @@
 #include "button_ao.h"
+#include "esp_log.h"
 
 State Button_init(Button *const me, Event const *const e);
 State Button_released(Button *const me, Event const *const e);
@@ -21,8 +22,7 @@ State Button_released(Button *const me, Event const *const e){
             break;
 
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            transition(&me->super.super, (StateHandler)&Button_pressed);
-            status = HANDLED_STATUS;
+            status = transition(&me->super.super, (StateHandler)&Button_pressed);
             break;
         
         case EXIT_SIG:
@@ -47,13 +47,11 @@ State Button_pressed(Button *const me, Event const *const e){
             break;
 
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            transition(&me->super.super, (StateHandler)&Button_pre_doublepressed);
-            status = HANDLED_STATUS;
+            status = transition(&me->super.super, (StateHandler)&Button_pre_doublepressed);
             break;
         
         case BUTTON_HOLD_TIMEOUT_SIG:
-            transition(&me->super.super, (StateHandler)&Button_hold);
-            status = HANDLED_STATUS;
+            status = transition(&me->super.super, (StateHandler)&Button_hold);
             break;
         
         case EXIT_SIG:
@@ -77,13 +75,11 @@ State Button_pre_doublepressed(Button *const me, Event const *const e){
             break;
         
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            transition(&me->super.super, (StateHandler)&Button_doublepressed);
-            status = HANDLED_STATUS;
+            status = transition(&me->super.super, (StateHandler)&Button_doublepressed);
             break;
         
         case BUTTON_DOUBLE_PRESS_TIMEOUT_SIG:
-            transition(&me->super.super, (StateHandler)&Button_released);
-            status = HANDLED_STATUS;
+            status = transition(&me->super.super, (StateHandler)&Button_released);
             break;
 
         case EXIT_SIG:
@@ -107,8 +103,7 @@ State Button_hold(Button *const me, Event const *const e){
             break;
         
         case EV_POLLING_BUTTON_STATE_CHANGED:
-            transition(&me->super.super, (StateHandler)&Button_released);
-            status = HANDLED_STATUS;
+            status = transition(&me->super.super, (StateHandler)&Button_released);
             break;
 
         case EXIT_SIG:
