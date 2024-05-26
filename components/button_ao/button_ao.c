@@ -56,11 +56,13 @@ State Button_released(Button *const me, Event const *const e){
 
 State Button_pressed(Button *const me, Event const *const e){
     State status;
+    Event evt = { LAST_EVENT_FLAG, (void *)0};
     switch (e->sig)
     {
         case ENTRY_SIG:
             TimeEvent_arm(&me->holdTimer);
-            Active_post(AO_Broker, &(Event){ EV_BUTTON_PRESSED });
+            evt.sig = EV_BUTTON_PRESSED;
+            Active_post(AO_Broker, &evt);
             status = HANDLED_STATUS;
             break;
 
@@ -114,10 +116,12 @@ State Button_pre_doublepressed(Button *const me, Event const *const e){
 }
 State Button_hold(Button *const me, Event const *const e){
     State status;
+    Event evt = { LAST_EVENT_FLAG, (void *)0};
         switch (e->sig)
         {
         case ENTRY_SIG:
-            Active_post(AO_Broker, &(Event){ EV_BUTTON_HOLD });
+            evt.sig = EV_BUTTON_HOLD;
+            Active_post(AO_Broker, &evt);
             status = HANDLED_STATUS;
             break;
         
@@ -138,11 +142,13 @@ State Button_hold(Button *const me, Event const *const e){
 
 State Button_doublepressed(Button *const me, Event const *const e){
     State status;
+    Event evt = { LAST_EVENT_FLAG, (void *)0};
         switch (e->sig)
         {
         case ENTRY_SIG:
             TimeEvent_disarm(&me->doublePressTimer);
-            Active_post(AO_Broker, &(Event){ EV_BUTTON_DOUBLE_PRESS });
+            evt.sig = EV_BUTTON_DOUBLE_PRESS;
+            Active_post(AO_Broker, &evt);
             status = transition(&me->super.super, (StateHandler)&Button_released);
             break;
         
