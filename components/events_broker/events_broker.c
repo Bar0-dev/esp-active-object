@@ -13,7 +13,7 @@ State Broker_publish(Broker * const me, Event const * const e)
             for (int q = 0; q<globalEvent->subscribers; q++)
             {
                 Active *ao=globalEvent->aos[q];
-                Active_post(ao, &(Event){ e->sig });
+                Active_post(ao, e);
             }
         }
     }

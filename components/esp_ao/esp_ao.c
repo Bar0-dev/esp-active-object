@@ -3,8 +3,8 @@
 
 #include "esp_log.h"
 
-static Event const entryEvt = { ENTRY_SIG };
-static Event const exitEvt = { EXIT_SIG };
+static Event const entryEvt = { ENTRY_SIG, (void*)0 };
+static Event const exitEvt = { EXIT_SIG, (void*)0 };
 
 void Fsm_ctor(Fsm * const me, StateHandler initial)
 {

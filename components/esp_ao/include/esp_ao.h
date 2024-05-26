@@ -31,6 +31,7 @@ enum ReservedSignals
 typedef struct
 {
     Signal sig;
+    void *payload;
     /*additional subclass data*/
 } Event;
 

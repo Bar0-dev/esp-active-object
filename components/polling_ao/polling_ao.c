@@ -13,7 +13,8 @@ static const gpio_config_t gpioConfig =
 State Polling_polling(Polling * const me, Event const * const e)
 {
     State status;
-    bool buttonCurrentState;
+    static Event evt = { EV_POLLING_BUTTON_STATE_CHANGED, (void*)0 }; 
+    static bool buttonCurrentState;
     switch (e->sig)
     {
     case ENTRY_SIG:
@@ -32,8 +33,9 @@ State Polling_polling(Polling * const me, Event const * const e)
     
     case BUTTON_DEBOUNCED_SIG:
         buttonCurrentState = (bool)gpio_get_level(BUTTON_PIN);
+        evt.payload = &buttonCurrentState;
         if(buttonCurrentState != me->buttonPrevState){
-            Active_post(AO_Broker, &(Event){ EV_POLLING_BUTTON_STATE_CHANGED });
+            Active_post(AO_Broker, &evt);
             me->buttonPrevState = buttonCurrentState;
         }
         TimeEvent_arm(&me->pollTimer);
