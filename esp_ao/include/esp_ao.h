@@ -1,6 +1,5 @@
-#pragma once
 #ifndef ESP_AO_H
-#define ESO_AO_H
+#define ESP_AO_H
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
