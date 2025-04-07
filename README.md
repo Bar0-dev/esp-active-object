@@ -15,8 +15,10 @@ It supports:
 
 ```
 esp_ao/               # The AO framework component
-├── esp_ao.h          # Public API and type definitions
+├── include/
+│   └── esp_ao.h      # Public API and type definitions
 ├── esp_ao.c          # Implementation of active objects and timers
+├── CMakeLists.txt
 ├── README.md         # This file
 
 your_project/
