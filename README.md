@@ -36,12 +36,13 @@ your_project/
 
 ```bash
 cd your_project/components
-git clone https://github.com/your-username/esp_ao.git
+
+git clone https://github.com/Bar0-dev/esp-active-object.git esp_ao/
 ```
 
 ### Option 2: Manually copy the source files
 
-Copy `esp_ao.c` and `esp_ao.h` to your project's `components/esp_ao/` directory.
+Copy `esp_ao.c, `include/esp_ao.h` and `CMakeLists.txt` to your project's `components/esp_ao/` directory.
 
 ### Then, in other components `CMakeLists.txt`:
 
