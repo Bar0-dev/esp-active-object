@@ -1,4 +1,4 @@
-# ESP-AO: Active Object Framework for ESP32 with Hierarchical State Machines
+# ESP-AO: [Active Object](https://www.state-machine.com/active-object) Framework for ESP32 with Hierarchical State Machines
 
 This project provides a lightweight and extensible active object (AO) framework for embedded systems, specifically designed for the ESP32 platform using ESP-IDF and FreeRTOS.
 
@@ -226,5 +226,3 @@ TimeEvent_disarm(&timer);  // Stop it
 ## 📄 License
 
 MIT License
-
----
